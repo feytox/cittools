@@ -2,6 +2,7 @@ from telnetlib import DO
 import cit_main
 import base64
 from os.path import exists
+import json
 
 def getValueOrNone(dict1: dict, key) -> str:
     '''
@@ -11,12 +12,27 @@ def getValueOrNone(dict1: dict, key) -> str:
         return dict1[key]
     return ""
 
+def getItemNameFromLang(id: str) -> str:
+    '''
+    Получение имени предмета из языкового файла
+    '''
+    with open("ru_ru.json", "r", encoding="utf-8") as f:
+        lang = f.read()
+    lang_dict = json.loads(lang)
+    if f'item.minecraft.{id}' in lang_dict:
+        return lang_dict[f'item.minecraft.{id}']
+    elif f'block.minecraft.{id}' in lang_dict:
+        return lang_dict[f'block.minecraft.{id}']
+    return id    
+
 def getMatchItemsOrNone(dict1: dict) -> str:
     '''
     Получение соответствующих предметов предмета
     '''
     if "matchItems" in dict1:
-        return dict1["matchItems"].replace(' ', "<br>")
+        matchItems = dict1["matchItems"].split(' ')
+        matchItems = [getItemNameFromLang(item) for item in matchItems]
+        return "<br>".join(matchItems)
     return ""    
 
 def getBase64(pathToPng: str) -> str:
