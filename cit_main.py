@@ -61,7 +61,4 @@ def getItems() -> list[str]:
         for file in getDirectory(item_folder)['files']:
             if '.properties' in file:
                 items.append(replaceSlashes(item_folder) + f'/{file}')
-    return items            
-
-if __name__ == "__main__":
-    print(getUniByStr("something not русский"))
+    return items
