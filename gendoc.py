@@ -1,8 +1,9 @@
-from telnetlib import DO
 import cit_main
 import base64
 from os.path import exists
-import json
+from id2lang import IdTranslator
+
+translator = IdTranslator()
 
 def getValueOrNone(dict1: dict, key) -> str:
     '''
@@ -10,20 +11,7 @@ def getValueOrNone(dict1: dict, key) -> str:
     '''
     if key in dict1:
         return dict1[key]
-    return ""
-
-def getItemNameFromLang(id: str) -> str:
-    '''
-    Получение имени предмета из языкового файла
-    '''
-    with open("ru_ru.json", "r", encoding="utf-8") as f:
-        lang = f.read()
-    lang_dict = json.loads(lang)
-    if f'item.minecraft.{id}' in lang_dict:
-        return lang_dict[f'item.minecraft.{id}']
-    elif f'block.minecraft.{id}' in lang_dict:
-        return lang_dict[f'block.minecraft.{id}']
-    return id    
+    return ""    
 
 def getMatchItemsOrNone(dict1: dict) -> str:
     '''
@@ -31,7 +19,7 @@ def getMatchItemsOrNone(dict1: dict) -> str:
     '''
     if "matchItems" in dict1:
         matchItems = dict1["matchItems"].split(' ')
-        matchItems = [getItemNameFromLang(item) for item in matchItems]
+        matchItems = [translator.getItemNameFromLang(item) for item in matchItems]
         return "<br>".join(matchItems)
     return ""    
 
@@ -56,6 +44,11 @@ def getNameOrNone(itemPath: str) -> str:
     Получение имени предмета
     '''
     if name := cit_main.getName(itemPath):
+        if ".*(" in name:
+            name = name.replace("iregex:.*(", "")
+            name = name.split("|")
+            name = ['*' + item_name for item_name in name]
+            name = "|".join(name)
         if ").*" in name:
             name = name.replace("|", "*<br>").replace(").", "")
         elif "iregex:(" in name:
@@ -63,16 +56,29 @@ def getNameOrNone(itemPath: str) -> str:
         return name.replace("ipattern:", "").replace("iregex:(", "").replace("|", "<br>")
     return ""    
 
+def getLoreOrNone(dict1: dict):
+    '''
+    Получение подписи предмета
+    '''
+    lore = []
+    for dict_key in dict1:
+        if "nbt.display.Lore" in dict_key:
+            lore.append(dict1[dict_key])
+    if lore != []:
+        return "<br>".join(lore)
+    return ""
+
 class Documentation:
-    def __init__(self, docName: str) -> None:
+    def __init__(self, docName: str, rp_name: str = None) -> None:
         self.docName = docName
+        self.rp_name = rp_name
         pass
 
     def getAllProperties(self):
         '''
         Получение информации о всех предметах
         '''
-        items = cit_main.getItems()
+        items = cit_main.getItems(self.rp_name)
         self.allItems = []
         for item in items:
             item_prop = cit_main.getProperties(item)
@@ -99,7 +105,7 @@ class Documentation:
             # имя
             item_doc.append("<td><p>" + getNameOrNone(item["path"]) + "</p></td>")
             # подпись (lore)
-            item_doc.append('<td><p class="lore">' + getValueOrNone(item, "nbt.display.Lore") + "</p></td>")
+            item_doc.append('<td><p class="lore">' + getLoreOrNone(item) + "</p></td>")
             
             item_doc.append("</tr>")
             docs.append("\n".join(item_doc))
@@ -109,6 +115,7 @@ class Documentation:
             f.write("\n".join(empty_doc))
 
 if __name__ == "__main__":
-    documentation = Documentation("rp_doc")
+    rp_name = input('Введите название ресурспака (или пропустите, чтобы выбрать первый): ')
+    documentation = Documentation("rp_doc", rp_name)
     documentation.generateDoc()
     print("Генерация документации прошла успешно!")         
