@@ -69,8 +69,10 @@ def getLoreOrNone(dict1: dict):
     return ""
 
 class Documentation:
-    def __init__(self, docName: str, rp_name: str = None) -> None:
+    def __init__(self, docName: str, rp_folder: str = None, rp_name: str = None) -> None:
         self.docName = docName
+        self.rp_folder = rp_folder
+        if not rp_name: rp_name = rp_folder
         self.rp_name = rp_name
         pass
 
@@ -78,7 +80,7 @@ class Documentation:
         '''
         Получение информации о всех предметах
         '''
-        items = cit_main.getItems(self.rp_name)
+        items = cit_main.getItems(self.rp_folder)
         self.allItems = []
         for item in items:
             item_prop = cit_main.getProperties(item)
@@ -92,7 +94,7 @@ class Documentation:
         self.getAllProperties()
 
         with open("empty_doc.html", "r", encoding="utf-8") as f:
-            empty_doc = f.read().split("\n")
+            empty_doc = f.read()
         docs = []
         for item in self.allItems:
             item_doc = ["<tr>"]
@@ -110,15 +112,13 @@ class Documentation:
             item_doc.append("</tr>")
             docs.append("\n".join(item_doc))
         docs = "\n".join(docs)
-        for i, str1 in enumerate(empty_doc):
-            if "</table>" in str1:
-                break
-        empty_doc.insert(i, docs)
+        empty_doc = empty_doc.replace("<!-- gendoc_rpname -->", self.rp_name).replace("<!-- gendoc_table -->", docs)
         with open(self.docName + ".html", "w", encoding="utf-8") as f:
-            f.write("\n".join(empty_doc))
+            f.write(empty_doc)
 
 if __name__ == "__main__":
-    rp_name = input('Введите название ресурспака (или пропустите, чтобы выбрать первый): ')
-    documentation = Documentation("rp_doc", rp_name)
+    rp_folder = input('Введите название ПАПКИ ресурспака (ENTER, чтобы выбрать первый): ')
+    rp_name = input("Введите отображаемое название ресурспака: (ENTER, чтобы выбрать название папки) ")
+    documentation = Documentation("rp_doc", rp_folder, rp_name)
     documentation.generateDoc()
     print("Генерация документации прошла успешно!")         
