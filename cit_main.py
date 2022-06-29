@@ -31,7 +31,7 @@ def getProperties(file) -> dict:
         strings = f.read().split('\n')
     for str1 in strings:
         str1 = str1.split('=')
-        if str1 != ['']:
+        if len(str1) > 1:
             res[str1[0]] = str1[1]
     return res    
 
@@ -76,12 +76,15 @@ def setProperty(file, key, value) -> None:
     with open(file, 'w') as f:
         f.write('\n'.join(new_props_text))    
 
-def getItems() -> list[str]:
+def getItems(rp_name: str = None) -> list[str]:
     '''
     Получение путей всех предметов из первого ресурспака из папки rp
     '''
     rps = getDirectory('rp')['folders']
-    cit_path = f'rp/{rps[0]}/assets/minecraft/optifine/cit'
+    if rp_name and rp_name in rps:
+        cit_path = f'rp/{rp_name}/assets/minecraft/optifine/cit'
+    else:    
+        cit_path = f'rp/{rps[0]}/assets/minecraft/optifine/cit'
     cit_directory = getDirectory(cit_path)
     items = []
     if 'files' in cit_directory:
