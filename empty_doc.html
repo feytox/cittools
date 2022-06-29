@@ -4,6 +4,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>CIT Documentation: <!-- gendoc_rpname --> </title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
 	<style>
 		body {
 			color: #fff;
@@ -17,7 +18,6 @@
   		text-align: center;
 		}
 		img {
-			width: 128px;
     	height: 128px;
 		}
 		td {
@@ -37,6 +37,16 @@
 		.lore {
 			width: 100px;
 		}
+    th.sorted[data-order="-1"]::after {
+  content: "🠻"
+}
+
+th.sorted[data-order="1"]::after {
+  content: "🠹"
+}
+.table_sort th {
+    cursor: pointer;
+}
 		/* ===== Scrollbar CSS ===== */
   p::-webkit-scrollbar {
   width: 12px;               /* width of the entire scrollbar */
@@ -51,21 +61,75 @@ p::-webkit-scrollbar-thumb {
   border-radius: 0.1px;       /* roundness of the scroll thumb */
   border: 5px solid #181A1B;  /* creates padding around scroll thumb */
 }
-
+input {
+  width: -webkit-fill-available;
+  text-align: center;
+  background-color: #181a1b !important;
+  color: #fff !important;
+}
 	</style>
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+
+    const getSort = ({ target }) => {
+        const order = (target.dataset.order = -(target.dataset.order || -1));
+        const index = [...target.parentNode.cells].indexOf(target);
+        const collator = new Intl.Collator(['en', 'ru'], { numeric: true });
+        const comparator = (index, order) => (a, b) => order * collator.compare(
+            a.children[index].innerHTML,
+            b.children[index].innerHTML
+        );
+        
+        for(const tBody of target.closest('table').tBodies)
+            tBody.append(...[...tBody.rows].sort(comparator(index, order)));
+
+        for(const cell of target.parentNode.cells)
+            cell.classList.toggle('sorted', cell === target);
+    };
+    
+    document.querySelectorAll('.table_sort thead').forEach(tableTH => tableTH.addEventListener('click', () => getSort(event)));
+    
+});
+  </script>
+  <script>
+    function tableSearch() {
+    var phrase = document.getElementById('search-text');
+    var table = document.getElementById('info-table');
+    var regPhrase = new RegExp(phrase.value, 'i');
+    var flag = false;
+    for (var i = 1; i < table.rows.length; i++) {
+        flag = false;
+        for (var j = table.rows[i].cells.length - 1; j >= 0; j--) {
+            flag = regPhrase.test(table.rows[i].cells[j].innerHTML);
+            if (flag) break;
+        }
+        if (flag) {
+            table.rows[i].style.display = "";
+        } else {
+            table.rows[i].style.display = "none";
+        }
+
+    }
+}
+  </script>
 </head>
 <body>
 	<div>
-	<h1>Документация по ресурс паку</h1>
-	<table border="1">
-   <tr>
-    <th>Тип</th>
-    <th>Картинка</th>
-    <th>Предмет</th>
-    <th>Имя</th>
-    <th>Подпись</th>
-   </tr>
-   <!-- gendoc_table -->
+	<h1>Документация для <!-- gendoc_rpname --></h1>
+	<input class="form-control" type="text" placeholder="Поиск" id="search-text" onkeyup="tableSearch()"><br><br>
+	<table border="1" class="table_sort table table-dark table-striped" id="info-table">
+		<thead>
+  	 <tr>
+  	  <th>Тип</th>
+  	  <th>Картинка</th>
+  	  <th>Предмет</th>
+  	  <th>Имя</th>
+  	  <th>Подпись</th>
+  	 </tr>
+		</thead>
+		<tbody>
+			<!-- gendoc_table -->
+		</tbody>
   </table> 
   </div>
 </body>
