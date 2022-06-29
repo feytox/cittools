@@ -3,6 +3,11 @@ import base64
 from os.path import exists
 from id2lang import IdTranslator
 import sys
+import argparse
+
+parser = argparse.ArgumentParser(description='Генератор документации к ресурспакам.')
+parser.add_argument('--folder', type=str, default=None, help='название ПАПКИ ресурспака')
+parser.add_argument('--name', type=str, default=None, help='название ресурспака')
 
 translator = IdTranslator()
 
@@ -130,8 +135,14 @@ class Documentation:
             f.write(empty_doc)
 
 if __name__ == "__main__":
-    rp_folder = input('Введите название ПАПКИ ресурспака (ENTER, чтобы выбрать первый): ')
-    rp_name = input("Введите отображаемое название ресурспака: (ENTER, чтобы выбрать название папки) ")
+    foo = parser.parse_args()
+    rp_folder = foo.folder
+    rp_name = foo.name
+
+    if not rp_folder:
+        rp_folder = input('Введите название ПАПКИ ресурспака или путь к ней (ENTER, чтобы выбрать первый): ')
+    if not rp_name:    
+        rp_name = input("Введите отображаемое название ресурспака: (ENTER, чтобы выбрать название папки): ")
     documentation = Documentation("rp_doc", rp_folder, rp_name)
     documentation.generateDoc()
     print("Генерация документации прошла успешно!")         
