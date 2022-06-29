@@ -2,8 +2,21 @@ import cit_main
 import base64
 from os.path import exists
 from id2lang import IdTranslator
+import sys
 
 translator = IdTranslator()
+
+def progressbar(it, prefix="", size=60, out=sys.stdout):
+    count = len(it)
+    def show(j):
+        x = int(size*j/count)
+        print("{}[{}{}] {}/{}".format(prefix, "#"*x, "."*(size-x), j, count), 
+                end='\r', file=out, flush=True)
+    show(0)
+    for i, item in enumerate(it):
+        yield item
+        show(i+1)
+    print("\n", flush=True, file=out)
 
 def getValueOrNone(dict1: dict, key) -> str:
     '''
@@ -96,7 +109,7 @@ class Documentation:
         with open("empty_doc.html", "r", encoding="utf-8") as f:
             empty_doc = f.read()
         docs = []
-        for item in self.allItems:
+        for item in progressbar(self.allItems, "Генерация: ", 40):
             item_doc = ["<tr>"]
             # тип
             item_doc.append("<td>" + getValueOrNone(item, "type") + "</td>")
