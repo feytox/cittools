@@ -13,13 +13,13 @@ def getValueOrNone(dict1: dict, key) -> str:
         return dict1[key]
     return ""    
 
-def getMatchItemsOrNone(dict1: dict) -> str:
+def getMatchItemsOrNone(dict1: dict[str, str]) -> str:
     '''
     Получение соответствующих предметов предмета
     '''
     if "matchItems" in dict1:
         matchItems = dict1["matchItems"].split(' ')
-        matchItems = [translator.getItemNameFromLang(item) for item in matchItems]
+        matchItems = [translator.getItemNameFromLang(item.lower()) for item in matchItems]
         return "<br>".join(matchItems)
     return ""    
 
@@ -36,7 +36,7 @@ def getImageOrNone(itemPath: str) -> str:
     Получение Base64 строки из пути к предмету
     '''
     if exists(imagePath := itemPath.replace(".properties", ".png")):
-        return getBase64(imagePath)
+        return '<img src="' + getBase64(imagePath) +'" alt="">'
     return ""    
 
 def getNameOrNone(itemPath: str) -> str:
@@ -53,7 +53,7 @@ def getNameOrNone(itemPath: str) -> str:
             name = name.replace("|", "*<br>").replace(").", "")
         elif "iregex:(" in name:
             name = name.replace(")", "")
-        return name.replace("ipattern:", "").replace("iregex:(", "").replace("|", "<br>")
+        return name.replace("ipattern:", "").replace("iregex:(", "").replace("|", "<br>").replace("iregex:", "")
     return ""    
 
 def getLoreOrNone(dict1: dict):
@@ -99,7 +99,7 @@ class Documentation:
             # тип
             item_doc.append("<td>" + getValueOrNone(item, "type") + "</td>")
             # картинка
-            item_doc.append('<td><img src="' + getImageOrNone(item["path"]) + '" alt=""></td>')
+            item_doc.append('<td>' + getImageOrNone(item["path"]) + '</td>')
             # предметы
             item_doc.append('<td><p class="item">' + getMatchItemsOrNone(item) + "</p></td>")
             # имя
@@ -110,7 +110,10 @@ class Documentation:
             item_doc.append("</tr>")
             docs.append("\n".join(item_doc))
         docs = "\n".join(docs)
-        empty_doc.insert(67, docs)
+        for i, str1 in enumerate(empty_doc):
+            if "</table>" in str1:
+                break
+        empty_doc.insert(i, docs)
         with open(self.docName + ".html", "w", encoding="utf-8") as f:
             f.write("\n".join(empty_doc))
 
