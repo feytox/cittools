@@ -17,8 +17,8 @@ def getMatchItemsOrNone(dict1: dict[str, str]) -> str:
     '''
     Получение соответствующих предметов предмета
     '''
-    if "matchItems" in dict1:
-        matchItems = dict1["matchItems"].split(' ')
+    if (key := "matchItems") in dict1 or (key := "items") in dict1:
+        matchItems = dict1[key].split(' ')
         matchItems = [translator.getItemNameFromLang(item.lower()) for item in matchItems if item != ""]
         return "<br>".join(matchItems)
     return ""    
