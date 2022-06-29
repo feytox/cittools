@@ -19,7 +19,7 @@ def getMatchItemsOrNone(dict1: dict[str, str]) -> str:
     '''
     if "matchItems" in dict1:
         matchItems = dict1["matchItems"].split(' ')
-        matchItems = [translator.getItemNameFromLang(item.lower()) for item in matchItems]
+        matchItems = [translator.getItemNameFromLang(item.lower()) for item in matchItems if item != ""]
         return "<br>".join(matchItems)
     return ""    
 
