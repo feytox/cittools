@@ -1,4 +1,4 @@
-# CitTools [Alpha] [Work In Progress]
+# CitTools [Early Alpha] [Work In Progress]
 Python скрипты и GUI для редактирования ресурспаков Minecraft, использующих Optifine CIT.
 
 ## gendoc.py
