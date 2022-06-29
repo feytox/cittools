@@ -76,13 +76,15 @@ def setProperty(file, key, value) -> None:
     with open(file, 'w') as f:
         f.write('\n'.join(new_props_text))    
 
-def getItems(rp_name: str = None) -> list[str]:
+def getItems(rp_folder: str = None) -> list[str]:
     '''
     Получение путей всех предметов из первого ресурспака из папки rp
     '''
     rps = getDirectory('rp')['folders']
-    if rp_name and rp_name in rps:
-        cit_path = f'rp/{rp_name}/assets/minecraft/optifine/cit'
+    if rp_folder and os.path.exists(rp_folder):
+        cit_path = f'{rp_folder}/assets/minecraft/optifine/cit'
+    elif rp_folder and rp_folder in rps:
+        cit_path = f'rp/{rp_folder}/assets/minecraft/optifine/cit'
     else:    
         cit_path = f'rp/{rps[0]}/assets/minecraft/optifine/cit'
     cit_directory = getDirectory(cit_path)
