@@ -76,31 +76,33 @@ def setProperty(file, key, value) -> None:
     with open(file, 'w') as f:
         f.write('\n'.join(new_props_text))    
 
+def getRpPath(rp_folder: str = None) -> str:
+    '''
+    Получение пути до папки с ресурспаком
+    '''
+    rps = getDirectory('rp')['folders']
+    if rp_folder and os.path.exists(rp_folder):
+        rp_path = f'{rp_folder}'
+    elif rp_folder and rp_folder in rps:
+        rp_path = f'rp/{rp_folder}'
+    else:    
+        rp_path = f'rp/{rps[0]}'
+    return rp_path    
+
+
 def getIcon(rp_folder: str = None):
     '''
     Получение пути к картинке ресурспака из первого ресурспака из папки rp, указанной папки или пути
     '''
-    rps = getDirectory('rp')['folders']
-    if rp_folder and os.path.exists(rp_folder):
-        icon_path = f'{rp_folder}/pack.png'
-    elif rp_folder and rp_folder in rps:
-        icon_path = f'rp/{rp_folder}/pack.png'
-    else:    
-        icon_path = f'rp/{rps[0]}/pack.png'
+    icon_path = getRpPath(rp_folder) + "/pack.png"
     if os.path.exists(icon_path):
         return icon_path
 
 def getItems(rp_folder: str = None) -> list[str]:
     '''
     Получение путей всех предметов из первого ресурспака из папки rp, указанной папки или пути
-    '''
-    rps = getDirectory('rp')['folders']
-    if rp_folder and os.path.exists(rp_folder):
-        cit_path = f'{rp_folder}/assets/minecraft/optifine/cit'
-    elif rp_folder and rp_folder in rps:
-        cit_path = f'rp/{rp_folder}/assets/minecraft/optifine/cit'
-    else:    
-        cit_path = f'rp/{rps[0]}/assets/minecraft/optifine/cit'
+    '''  
+    cit_path = getRpPath(rp_folder) + '/assets/minecraft/optifine/cit'
     cit_directory = getDirectory(cit_path)
     items = []
     if 'files' in cit_directory:
