@@ -32,7 +32,7 @@ def getProperties(file) -> dict:
     for str1 in strings:
         str1 = str1.split('=')
         if len(str1) > 1:
-            res[str1[0]] = "".join(str1[1:])
+            res[str1[0]] = "=".join(str1[1:])
     return res    
 
 def getName(file) -> str:
