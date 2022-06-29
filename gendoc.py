@@ -86,13 +86,25 @@ def getLoreOrNone(dict1: dict):
         return "<br>".join(lore)
     return ""
 
+def getIconOrNone(rp_folder: str = None):
+    '''
+    Получение иконки для документации
+    '''
+    if icon_path := cit_main.getIcon(rp_folder):
+        return f'<link rel="icon" type="image/png" sizes="16x16" href="{getBase64(icon_path)}" />'
+    return ""
+
 class Documentation:
     def __init__(self, docName: str, rp_folder: str = None, rp_name: str = None) -> None:
         self.docName = docName
         self.rp_folder = rp_folder
-        if not rp_name: rp_name = rp_folder
+        if not rp_name: 
+            rp_name = rp_folder
+            if '/' in rp_name:
+                rp_name = rp_name.split('/')[-1]
+            elif '\\' in rp_name:
+                rp_name = rp_name.split('\\')[-1]
         self.rp_name = rp_name
-        pass
 
     def getAllProperties(self):
         '''
@@ -131,6 +143,7 @@ class Documentation:
             docs.append("\n".join(item_doc))
         docs = "\n".join(docs)
         empty_doc = empty_doc.replace("<!-- gendoc_rpname -->", self.rp_name).replace("<!-- gendoc_table -->", docs)
+        empty_doc = empty_doc.replace("<!-- gendoc_icon -->", getIconOrNone(self.rp_folder))
         with open(self.docName + ".html", "w", encoding="utf-8") as f:
             f.write(empty_doc)
 
@@ -145,4 +158,4 @@ if __name__ == "__main__":
         rp_name = input("Введите отображаемое название ресурспака: (ENTER, чтобы выбрать название папки): ")
     documentation = Documentation("rp_doc", rp_folder, rp_name)
     documentation.generateDoc()
-    print("Генерация документации прошла успешно!")         
+    print("Генерация документации прошла успешно!")     

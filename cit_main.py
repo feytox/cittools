@@ -76,9 +76,23 @@ def setProperty(file, key, value) -> None:
     with open(file, 'w') as f:
         f.write('\n'.join(new_props_text))    
 
+def getIcon(rp_folder: str = None):
+    '''
+    Получение пути к картинке ресурспака из первого ресурспака из папки rp, указанной папки или пути
+    '''
+    rps = getDirectory('rp')['folders']
+    if rp_folder and os.path.exists(rp_folder):
+        icon_path = f'{rp_folder}/pack.png'
+    elif rp_folder and rp_folder in rps:
+        icon_path = f'rp/{rp_folder}/pack.png'
+    else:    
+        icon_path = f'rp/{rps[0]}/pack.png'
+    if os.path.exists(icon_path):
+        return icon_path
+
 def getItems(rp_folder: str = None) -> list[str]:
     '''
-    Получение путей всех предметов из первого ресурспака из папки rp
+    Получение путей всех предметов из первого ресурспака из папки rp, указанной папки или пути
     '''
     rps = getDirectory('rp')['folders']
     if rp_folder and os.path.exists(rp_folder):
