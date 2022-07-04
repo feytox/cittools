@@ -1,10 +1,12 @@
 import json
+from functools import lru_cache
 
 class IdTranslator:
     def __init__(self) -> None:
         with open("ru_ru.json", "r", encoding="utf-8") as f:
             self.lang = f.read()    
 
+    @lru_cache
     def getItemNameFromLang(self, id: str) -> str:
         '''
         Получение имени предмета из языкового файла.
